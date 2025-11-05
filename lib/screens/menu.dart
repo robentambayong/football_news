@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:football_news/widgets/left_drawer.dart';
+import 'package:football_news/widgets/news_card.dart';
 
-/// Home page of the Football News app
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
 
-  // User Information
-  final String nama = "Roben Joseph B Tambayong"; // Name
-  final String npm = "2406453594";  // NPM
-  final String kelas = "KKI";       // Class
+  final String nama = "Roben Joseph B Tambayong";
+  final String npm = "2406453594";
+  final String kelas = "KKI";
 
-  // List of menu buttons
   final List<ItemHomepage> items = [
     ItemHomepage("See Football News", Icons.newspaper),
     ItemHomepage("Add News", Icons.add),
@@ -18,7 +17,6 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Scaffold provides the structure for the page with AppBar and body
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -30,12 +28,12 @@ class MyHomePage extends StatelessWidget {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
+      drawer: const LeftDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Row for 3 InfoCards horizontally
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -44,10 +42,8 @@ class MyHomePage extends StatelessWidget {
                 InfoCard(title: 'Class', content: kelas),
               ],
             ),
-
             const SizedBox(height: 16.0),
 
-            // Center section with greeting text and grid of buttons
             Center(
               child: Column(
                 children: [
@@ -61,6 +57,7 @@ class MyHomePage extends StatelessWidget {
                       ),
                     ),
                   ),
+
                   GridView.count(
                     primary: true,
                     padding: const EdgeInsets.all(20),
@@ -82,7 +79,6 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-/// Card for displaying basic info (NPM, Name, Class)
 class InfoCard extends StatelessWidget {
   final String title;
   final String content;
@@ -105,59 +101,6 @@ class InfoCard extends StatelessWidget {
             const SizedBox(height: 8.0),
             Text(content),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Data model for menu items (button name + icon)
-class ItemHomepage {
-  final String name;
-  final IconData icon;
-
-  ItemHomepage(this.name, this.icon);
-}
-
-/// Card widget that acts as a clickable button
-class ItemCard extends StatelessWidget {
-  final ItemHomepage item;
-
-  const ItemCard(this.item, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.secondary,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: () {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(content: Text("Kamu telah menekan tombol ${item.name}!")),
-            );
-        },
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  item.icon,
-                  color: Colors.white,
-                  size: 30.0,
-                ),
-                const Padding(padding: EdgeInsets.all(3)),
-                Text(
-                  item.name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
