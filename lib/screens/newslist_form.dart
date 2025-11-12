@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:football_news/widgets/left_drawer.dart';
+import 'package:football_news/screens/menu.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class NewsFormPage extends StatefulWidget {
   const NewsFormPage({super.key});
@@ -12,196 +15,163 @@ class _NewsFormPageState extends State<NewsFormPage> {
   final _formKey = GlobalKey<FormState>();
   String _title = "";
   String _content = "";
-  String _category = "update";
+  String _category = "";
   String _thumbnail = "";
   bool _isFeatured = false;
 
-  final List<String> _categories = [
-    'transfer',
-    'update',
-    'exclusive',
-    'match',
-    'rumor',
-    'analysis',
-  ];
-
   @override
   Widget build(BuildContext context) {
+    // Get the request object from the provider
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Add News Form',
-          ),
-        ),
-        backgroundColor: Colors.indigo,
-        foregroundColor: Colors.white,
+        title: const Text('Add New News'),
       ),
-      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // === Title ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "News Title",
-                    labelText: "News Title",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'News Title',
+                  labelText: 'Title',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _title = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return "Title cannot be empty!";
-                    }
-                    return null;
-                  },
                 ),
+                onChanged: (String? value) {
+                  setState(() {
+                    _title = value!;
+                  });
+                },
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Title cannot be empty!';
+                  }
+                  return null;
+                },
               ),
-
-              // === Content ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: "News Content",
-                    labelText: "News Content",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'News Content',
+                  labelText: 'Content',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _content = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return "Content cannot be empty!";
-                    }
-                    return null;
-                  },
                 ),
+                maxLines: 5,
+                onChanged: (String? value) {
+                  setState(() {
+                    _content = value!;
+                  });
+                },
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Content cannot be empty!';
+                  }
+                  return null;
+                },
               ),
-
-              // === Category ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: "Category",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'e.g., match, transfer, update',
+                  labelText: 'Category',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
-                  initialValue: _category,
-                  items: _categories
-                      .map((cat) => DropdownMenuItem(
-                            value: cat,
-                            child: Text(cat[0].toUpperCase() + cat.substring(1)),
-                          ))
-                      .toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _category = newValue!;
-                    });
-                  },
                 ),
+                onChanged: (String? value) {
+                  setState(() {
+                    _category = value!;
+                  });
+                },
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Category cannot be empty!';
+                  }
+                  return null;
+                },
               ),
-
-              // === Thumbnail URL ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Thumbnail URL (optional)",
-                    labelText: "Thumbnail URL",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'Image URL',
+                  labelText: 'Thumbnail URL',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12.0)),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _thumbnail = value!;
-                    });
-                  },
                 ),
+                onChanged: (String? value) {
+                  setState(() {
+                    _thumbnail = value!;
+                  });
+                },
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Thumbnail URL cannot be empty!';
+                  }
+                  return null;
+                },
               ),
-
-              // === Is Featured ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SwitchListTile(
-                  title: const Text("Mark as Featured News"),
-                  value: _isFeatured,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _isFeatured = value;
-                    });
-                  },
+              const SizedBox(height: 16.0),
+              CheckboxListTile(
+                title: const Text('Is Featured?'),
+                value: _isFeatured,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isFeatured = value ?? false;
+                  });
+                },
+              ),
+              const SizedBox(height: 24.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Colors.white,
                 ),
-              ),
-
-              // === Save Button ===
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.indigo),
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text('News saved successfully!'),
-                              content: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Title: $_title'),
-                                    Text('Content: $_content'),
-                                    Text('Category: $_category'),
-                                    Text('Thumbnail: $_thumbnail'),
-                                    Text(
-                                      'Featured: ${_isFeatured ? "Yes" : "No"}',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  child: const Text('OK'),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              ],
-                            );
-                          },
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    // Send data to Django backend
+                    final response = await request.postJson(
+                      "http://localhost:8000/create-flutter/",
+                      jsonEncode({
+                        "title": _title,
+                        "content": _content,
+                        "thumbnail": _thumbnail,
+                        "category": _category,
+                        "is_featured": _isFeatured,
+                      }),
+                    );
+                    if (context.mounted) {
+                      if (response['status'] == 'success') {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text("News successfully saved!"),
+                        ));
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MyHomePage()),
                         );
-                        _formKey.currentState!.reset();
+                      } else {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text("Something went wrong, please try again."),
+                        ));
                       }
-                    },
-                    child: const Text(
-                      "Save",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                    }
+                  }
+                },
+                child: const Text(
+                  'Save News',
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ],
